@@ -49,7 +49,14 @@ public class Main {
             return null;
         }
 
-        // Crear la colección GIMNASIO
+        // Verificar si la colección ya existe
+        Collection existingCollection = DatabaseManager.getCollection(uri + "/db/" + collectionName, usuario, password);
+        if (existingCollection != null) {
+            System.out.println("La colección " + collectionName + " ya existe.");
+            return existingCollection;  // Retorna la colección existente
+        }
+
+        // Crear la colección si no existe
         CollectionManagementService mgtService =
                 (CollectionManagementService) rootCollection.getService("CollectionManagementService", "1.0");
         Collection gymCollection = mgtService.createCollection(collectionName);
