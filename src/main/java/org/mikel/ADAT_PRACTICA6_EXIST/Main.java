@@ -30,10 +30,10 @@ public class Main {
             subirArchivoXML(gymCollection, new File(rutaArchivo3));
 
             String xqueryIntermedio = generarXQueryIntermedioCuotaAdicional();
-            ejecutarYSubirXQuery(gymCollection, xqueryIntermedio, "cuotas_adicionales.xml");
+            ejecutarYSubirConsulta(gymCollection, xqueryIntermedio, "cuotas_adicionales.xml");
 
             String xqueryFinal = generarXQueryFinalTotal();
-            ejecutarYSubirXQuery(gymCollection, xqueryFinal, "cuotas_finales.xml");
+            ejecutarYSubirConsulta(gymCollection, xqueryFinal, "cuotas_finales.xml");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,19 +134,20 @@ public class Main {
             """;
     }
 
-    private static void ejecutarYSubirXQuery(Collection col, String xquery, String fileName) throws Exception {
-        XQueryService xQueryService = (XQueryService) col.getService("XQueryService", "1.0");
-        ResourceSet result = xQueryService.query(xquery);
-        XMLResource resource = (XMLResource) col.createResource(fileName, "XMLResource");
-        StringBuilder content = new StringBuilder("<result>");
-        ResourceIterator iter = result.getIterator();
-        while (iter.hasMoreResources()) {
-            Resource r = iter.nextResource();
-            content.append(r.getContent());
+    private static void ejecutarYSubirConsulta(Collection coleccion, String consultaXQuery, String nombreArchivo) throws Exception {
+        XQueryService servicioXQuery = (XQueryService) coleccion.getService("XQueryService", "1.0");
+        ResourceSet conjuntoResultados = servicioXQuery.query(consultaXQuery);
+        XMLResource recursoXML = (XMLResource) coleccion.createResource(nombreArchivo, "XMLResource");
+        StringBuilder contenido = new StringBuilder("<result>");
+        ResourceIterator iteradorRecursos = conjuntoResultados.getIterator();
+        while (iteradorRecursos.hasMoreResources()) {
+            Resource recurso = iteradorRecursos.nextResource();
+            contenido.append(recurso.getContent());
         }
-        content.append("</result>");
-        resource.setContent(content.toString());
-        col.storeResource(resource);
-        System.out.println("Documento guardado: " + fileName);
+        contenido.append("</result>");
+        recursoXML.setContent(contenido.toString());
+        coleccion.storeResource(recursoXML);
+        System.out.println("Documento guardado: " + nombreArchivo);
     }
+
 }
