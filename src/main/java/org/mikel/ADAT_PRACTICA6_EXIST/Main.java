@@ -137,17 +137,32 @@ public class Main {
     private static void ejecutarYSubirConsulta(Collection coleccion, String consultaXQuery, String nombreArchivo) throws Exception {
         XQueryService servicioXQuery = (XQueryService) coleccion.getService("XQueryService", "1.0");
         ResourceSet conjuntoResultados = servicioXQuery.query(consultaXQuery);
+
+        // Crear el recurso XML para guardar los resultados
         XMLResource recursoXML = (XMLResource) coleccion.createResource(nombreArchivo, "XMLResource");
         StringBuilder contenido = new StringBuilder("<result>");
         ResourceIterator iteradorRecursos = conjuntoResultados.getIterator();
+
+        // Imprimir y almacenar los resultados
+        System.out.println("Resultados de la consulta " + nombreArchivo + ":");
         while (iteradorRecursos.hasMoreResources()) {
             Resource recurso = iteradorRecursos.nextResource();
-            contenido.append(recurso.getContent());
+            String resultado = (String) recurso.getContent();
+
+            // Imprimir cada resultado en la consola
+            System.out.println(resultado);
+
+            // Agregar el resultado al contenido a ser almacenado
+            contenido.append(resultado);
         }
         contenido.append("</result>");
+
+        // Establecer el contenido del recurso XML
         recursoXML.setContent(contenido.toString());
         coleccion.storeResource(recursoXML);
+
         System.out.println("Documento guardado: " + nombreArchivo);
     }
+
 
 }
